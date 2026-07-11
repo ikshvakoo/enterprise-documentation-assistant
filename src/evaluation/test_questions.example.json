@@ -1,0 +1,16 @@
+[
+  {
+    "question": "What changed for exception processing?",
+    "relevant_issue_keys": [],
+    "relevant_source_types": ["jira"],
+    "relevant_file_names": [],
+    "relevant_title_contains": ["exception"]
+  },
+  {
+    "question": "What release notes mention account opening?",
+    "relevant_issue_keys": [],
+    "relevant_source_types": ["release_note"],
+    "relevant_file_names": [],
+    "relevant_title_contains": ["release notes"]
+  }
+]

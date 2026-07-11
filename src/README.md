@@ -38,6 +38,9 @@ Generated artifacts are written to `src/artifacts/`.
 
 # Draft simple release-note bullets from retrieved evidence
 & 'C:\Users\vsharma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' src\main.py release-notes "exception routing 26.2.0" --fix-version "26.2.0"
+
+# Evaluate retrieval quality with Recall@K and MRR
+& 'C:\Users\vsharma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' src\main.py eval-retrieval src\evaluation\test_questions.example.json --top-k 10
 ```
 
 ## Phase 1 Module Layout

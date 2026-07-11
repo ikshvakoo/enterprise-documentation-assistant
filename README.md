@@ -39,6 +39,7 @@ python src/main.py stats
 python src/main.py search "exception processing" --source-type jira --top-k 5
 python src/main.py answer "What changed for exception processing?" --top-k 3
 python src/main.py release-tickets "26.2.0" --limit 10
+python src/main.py eval-retrieval src/evaluation/test_questions.example.json --top-k 10
 ```
 
 ## Project Structure
@@ -56,4 +57,3 @@ src/
 ## Current Status
 
 Phase 1 is implemented. The next project step is to build the document generation workflow on top of the existing retrieval service.
-

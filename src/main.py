@@ -1,11 +1,15 @@
 import argparse
 import sys
+from pathlib import Path
 
 from config import DATA_DIR
 from config import DEFAULT_CHUNK_OVERLAP
 from config import DEFAULT_CHUNK_WORDS
 from config import DEFAULT_TOP_K
 from config import INDEX_PATH
+from evaluation import evaluate_retrieval
+from evaluation import load_questions
+from evaluation import result_to_text
 from generator import format_citation
 from generator import generate_answer
 from generator import generate_release_notes
@@ -96,6 +100,22 @@ def release_tickets(args: argparse.Namespace) -> int:
     return 0
 
 
+def eval_retrieval(args: argparse.Namespace) -> int:
+    """CLI handler that evaluates retrieval quality against a question set."""
+    service = ensure_service()
+    questions = load_questions(args.questions)
+    result = evaluate_retrieval(service, questions, top_k=args.top_k, filters=make_filters(args))
+    print(result_to_text(result))
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        import json
+
+        with args.output.open("w", encoding="utf-8", newline="\n") as handle:
+            json.dump(result.__dict__, handle, ensure_ascii=False, indent=2)
+        print(f"\nDetailed results written to: {args.output}")
+    return 0
+
+
 def make_parser() -> argparse.ArgumentParser:
     """Build the command-line parser and register all subcommands."""
     parser = argparse.ArgumentParser(description="Enterprise documentation assistant prototype")
@@ -127,6 +147,16 @@ def make_parser() -> argparse.ArgumentParser:
     release_tickets_parser.add_argument("--limit", type=int, default=25)
     release_tickets_parser.set_defaults(func=release_tickets)
 
+    eval_parser = subparsers.add_parser(
+        "eval-retrieval",
+        help="Evaluate retrieval with a JSON question set",
+    )
+    eval_parser.add_argument("questions", type=Path, help="Path to retrieval question JSON file")
+    eval_parser.add_argument("--top-k", type=int, default=10)
+    eval_parser.add_argument("--output", type=Path, help="Optional path for detailed JSON results")
+    add_filter_args(eval_parser)
+    eval_parser.set_defaults(func=eval_retrieval)
+
     stats_parser = subparsers.add_parser("stats", help="Show index statistics")
     stats_parser.set_defaults(func=stats)
     return parser
@@ -136,6 +166,11 @@ def add_query_args(parser: argparse.ArgumentParser) -> None:
     """Attach shared query and metadata-filter arguments to search-like commands."""
     parser.add_argument("query")
     parser.add_argument("--top-k", type=int, default=DEFAULT_TOP_K)
+    add_filter_args(parser)
+
+
+def add_filter_args(parser: argparse.ArgumentParser) -> None:
+    """Attach shared metadata-filter arguments to a parser."""
     parser.add_argument(
         "--source-type",
         choices=["jira", "release_note", "test_case"],
