@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Local/generated project artifacts
+src/artifacts/
+src/data/
+data_ori/
+data_anonymization_scripts/
+research_paper_assignment/
+project_proposal/
+tech_design/
+tech_design/rendered_review/
+*.extracted.txt
+
+# Office/PDF deliverables and temporary files
+~$*
+*.tmp
+*.log
+
+# Codex/local workspace metadata
+.agents/
+.codex/
+.codex_deps/
+
+# Environment and secrets
+.env
+*.pem
+*.key
+*.token
