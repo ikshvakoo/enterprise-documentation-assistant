@@ -36,6 +36,7 @@ src/data/
 python -m pip install -r requirements.txt
 python src/main.py build-index
 python src/main.py stats
+python src/main.py corpus-summary
 python src/main.py search "exception processing" --source-type jira --top-k 5
 python src/main.py answer "What changed for exception processing?" --top-k 3
 python src/main.py release-tickets "26.2.0" --limit 10

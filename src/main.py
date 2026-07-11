@@ -1,4 +1,5 @@
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -7,6 +8,8 @@ from config import DEFAULT_CHUNK_OVERLAP
 from config import DEFAULT_CHUNK_WORDS
 from config import DEFAULT_TOP_K
 from config import INDEX_PATH
+from corpus_summary import build_corpus_summary
+from corpus_summary import format_corpus_summary
 from evaluation import evaluate_retrieval
 from evaluation import load_questions
 from evaluation import result_to_text
@@ -80,6 +83,18 @@ def stats(_: argparse.Namespace) -> int:
     return 0
 
 
+def corpus_summary(args: argparse.Namespace) -> int:
+    """CLI handler that summarizes the local anonymized source dataset."""
+    summary = build_corpus_summary(DATA_DIR)
+    print(format_corpus_summary(summary))
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        with args.output.open("w", encoding="utf-8", newline="\n") as handle:
+            json.dump(summary.to_dict(), handle, ensure_ascii=False, indent=2)
+        print(f"\nSummary JSON written to: {args.output}")
+    return 0
+
+
 def release_tickets(args: argparse.Namespace) -> int:
     """CLI handler that lists Jira issues tied to a selected fix version."""
     service = ensure_service()
@@ -108,8 +123,6 @@ def eval_retrieval(args: argparse.Namespace) -> int:
     print(result_to_text(result))
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        import json
-
         with args.output.open("w", encoding="utf-8", newline="\n") as handle:
             json.dump(result.__dict__, handle, ensure_ascii=False, indent=2)
         print(f"\nDetailed results written to: {args.output}")
@@ -159,6 +172,13 @@ def make_parser() -> argparse.ArgumentParser:
 
     stats_parser = subparsers.add_parser("stats", help="Show index statistics")
     stats_parser.set_defaults(func=stats)
+
+    corpus_parser = subparsers.add_parser(
+        "corpus-summary",
+        help="Summarize source dataset counts and date/version span",
+    )
+    corpus_parser.add_argument("--output", type=Path, help="Optional path for summary JSON")
+    corpus_parser.set_defaults(func=corpus_summary)
     return parser
 
 

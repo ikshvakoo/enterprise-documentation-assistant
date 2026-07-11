@@ -30,6 +30,9 @@ Generated artifacts are written to `src/artifacts/`.
 # Show corpus/index counts
 & 'C:\Users\vsharma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' src\main.py stats
 
+# Show source dataset counts and release/test-case span
+& 'C:\Users\vsharma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' src\main.py corpus-summary
+
 # Search only one corpus type
 & 'C:\Users\vsharma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' src\main.py search "exception processing" --source-type jira --top-k 5
 
