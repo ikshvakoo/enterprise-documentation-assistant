@@ -42,6 +42,12 @@ Generated artifacts are written to `src/artifacts/`.
 # Draft simple release-note bullets from retrieved evidence
 & 'C:\Users\vsharma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' src\main.py release-notes "exception routing 26.2.0" --fix-version "26.2.0"
 
+# Generate structured release notes by fix version and export Markdown/DOCX
+& 'C:\Users\vsharma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' src\main.py generate-release-notes --fix-version "26.2.0" --output-md src\artifacts\release_notes_26_2_0.md --output-docx src\artifacts\release_notes_26_2_0.docx
+
+# Generate structured release notes from keyword-filtered tickets
+& 'C:\Users\vsharma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' src\main.py generate-release-notes --query "exception processing" --max-tickets 15 --output-md src\artifacts\exception_processing_release_notes.md
+
 # Evaluate retrieval quality with Recall@K and MRR
 & 'C:\Users\vsharma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' src\main.py eval-retrieval src\evaluation\test_questions.example.json --top-k 10
 ```

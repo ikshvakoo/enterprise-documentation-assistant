@@ -1,5 +1,6 @@
-"""Generation package.
+"""Structured generation workflows for release and QA documentation."""
 
-Phase 1 keeps generation extractive and local. Later phases will add structured
-release-note and test-case draft generation here.
-"""
+from .release_notes import generate_release_notes_for_selection
+from .release_notes import parse_issue_keys
+
+__all__ = ["generate_release_notes_for_selection", "parse_issue_keys"]

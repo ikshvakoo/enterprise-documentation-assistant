@@ -40,6 +40,7 @@ python src/main.py corpus-summary
 python src/main.py search "exception processing" --source-type jira --top-k 5
 python src/main.py answer "What changed for exception processing?" --top-k 3
 python src/main.py release-tickets "26.2.0" --limit 10
+python src/main.py generate-release-notes --fix-version "26.2.0" --output-md src/artifacts/release_notes_26_2_0.md --output-docx src/artifacts/release_notes_26_2_0.docx
 python src/main.py eval-retrieval src/evaluation/test_questions.example.json --top-k 10
 ```
 

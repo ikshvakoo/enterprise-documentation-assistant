@@ -13,6 +13,10 @@ from corpus_summary import format_corpus_summary
 from evaluation import evaluate_retrieval
 from evaluation import load_questions
 from evaluation import result_to_text
+from export import write_markdown
+from export import write_release_notes_docx
+from generation import generate_release_notes_for_selection
+from generation import parse_issue_keys
 from generator import format_citation
 from generator import generate_answer
 from generator import generate_release_notes
@@ -69,6 +73,31 @@ def release_notes(args: argparse.Namespace) -> int:
     service = ensure_service()
     results = service.search(args.query, top_k=args.top_k * 4, filters=make_filters(args))
     print(generate_release_notes(results))
+    return 0
+
+
+def generate_release_notes_command(args: argparse.Namespace) -> int:
+    """CLI handler that creates a structured release-note draft and exports it."""
+    service = ensure_service()
+    issue_keys = parse_issue_keys(args.issue_key, args.issue_keys_file)
+    draft = generate_release_notes_for_selection(
+        service=service,
+        fix_version=args.fix_version,
+        issue_keys=issue_keys,
+        query=args.query,
+        max_tickets=args.max_tickets,
+    )
+
+    if args.output_md:
+        write_markdown(draft.markdown, args.output_md)
+        print(f"Markdown release notes written to: {args.output_md}")
+    if args.output_docx:
+        write_release_notes_docx(draft.markdown, args.output_docx)
+        print(f"DOCX release notes written to: {args.output_docx}")
+    if not args.output_md and not args.output_docx:
+        print(draft.markdown)
+
+    print(f"\nTickets included: {len(draft.tickets)}")
     return 0
 
 
@@ -151,6 +180,23 @@ def make_parser() -> argparse.ArgumentParser:
     notes_parser = subparsers.add_parser("release-notes", help="Draft release-note bullets from retrieved context")
     add_query_args(notes_parser)
     notes_parser.set_defaults(func=release_notes)
+
+    generate_notes_parser = subparsers.add_parser(
+        "generate-release-notes",
+        help="Generate structured release notes from selected Jira tickets",
+    )
+    generate_notes_parser.add_argument("--fix-version", help="Select Jira tickets by fix version")
+    generate_notes_parser.add_argument(
+        "--issue-key",
+        action="append",
+        help="Select one or more issue keys. Can be repeated or comma-separated.",
+    )
+    generate_notes_parser.add_argument("--issue-keys-file", type=Path, help="Text file containing one issue key per line")
+    generate_notes_parser.add_argument("--query", help="Optional keyword query to narrow selected tickets")
+    generate_notes_parser.add_argument("--max-tickets", type=int, default=40)
+    generate_notes_parser.add_argument("--output-md", type=Path, help="Path for generated Markdown output")
+    generate_notes_parser.add_argument("--output-docx", type=Path, help="Path for generated DOCX output")
+    generate_notes_parser.set_defaults(func=generate_release_notes_command)
 
     release_tickets_parser = subparsers.add_parser(
         "release-tickets",
